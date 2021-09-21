@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:8000',
+  uri: 'https://peaceful-dusk-20390.herokuapp.com/',
 });
 
 const authLink = setContext(() => {
