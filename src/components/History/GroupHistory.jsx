@@ -18,22 +18,6 @@ import { StyleRounded } from '@material-ui/icons';
 import { style } from 'dom-helpers';
 import { netGroup } from 'utils/functions';
 
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     maxWidth: 345,
-//     minWidth: 200,
-//   },
-//   media: {
-//     height: 140,
-//   },
-//   container: {
-//     flexGrow: 1,
-//   },
-//   space: {
-//     flexGrow: 1,
-//   },
-// }));
-
 export function GroupHistory(props) {
   //   const styles = useStyles();
   const { groupId } = props;
@@ -41,7 +25,7 @@ export function GroupHistory(props) {
 
   const context = useContext(AuthContext);
 
-  const total = netGroup(context.user.id, transactions);
+  const total = netGroup(context.user ? context.user.id : null, transactions);
 
   const { loading } = useQuery(GROUP_TRANSACTIONS, {
     variables: { getTransactionsByGroupIdGroupId: groupId },
@@ -62,7 +46,9 @@ export function GroupHistory(props) {
     },
   });
 
-  console.log('context', context);
+  if (!context.user) {
+    return <h1>Not Logged In</h1>;
+  }
 
   return (
     <div>

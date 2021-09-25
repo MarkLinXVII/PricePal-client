@@ -8,6 +8,7 @@ import { AuthContext } from 'context/auth';
 import gql from 'graphql-tag';
 import { useContext, useEffect, useState } from 'react';
 import { ExpenseCard } from 'components/Expenses/ExpenseCard';
+import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,10 +26,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
   const styles = useStyles();
+  const router = useRouter();
   const { user } = useContext(AuthContext);
   const [createGroup, setCreateGroup] = useState(false);
   const [joinGroup, setJoinGroup] = useState(false);
   const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, []);
 
   const { loading, data } = useQuery(GET_USER, {
     onCompleted: (data) => {
@@ -54,10 +62,6 @@ export default function Dashboard() {
   const handleCloseJoinGroup = () => {
     setJoinGroup(false);
   };
-
-  if (!user) {
-    return <h1>Login to view your dashboard</h1>;
-  }
 
   return (
     <section className={styles.root}>

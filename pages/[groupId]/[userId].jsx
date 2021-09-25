@@ -155,8 +155,10 @@ export default function UserPage() {
   const router = useRouter();
   const userQueryKey = 'userId';
   const groupQueryKey = 'groupId';
-  const [userId, setUserId] = useState(router.query[userQueryKey] ||
-    router.asPath.match(new RegExp(`[&?]${userQueryKey}=(.*)(&|$)`)));
+  const [userId, setUserId] = useState(
+    router.query[userQueryKey] ||
+      router.asPath.match(new RegExp(`[&?]${userQueryKey}=(.*)(&|$)`))
+  );
   const groupId =
     router.query[groupQueryKey] ||
     router.asPath.match(new RegExp(`[&?]${groupQueryKey}=(.*)(&|$)`));
@@ -165,13 +167,11 @@ export default function UserPage() {
 
   const [createExpense, setCreateExpense] = useState(false);
 
-  const handleCreateExpenseClick = () => {
-    setCreateExpense(true);
-  };
-
-  const handleCreateExpenseClose = () => {
-    setCreateExpense(false);
-  };
+  useEffect(() => {
+    if (!context.user) {
+      router.push('/');
+    }
+  }, []);
 
   useQuery(GROUP_INFO, {
     variables: { getGroupByIdGroupId: groupId },
@@ -183,15 +183,10 @@ export default function UserPage() {
     },
   });
 
-  // const { loading } = useQuery(GROUP_TRANSACTIONS, {
-  //   variables: { getTransactionsByGroupIdGroupId: groupId },
-  //   onCompleted: (data) => {
-  //     setTransactions(data.getTransactionsByGroupId);
-  //   },
-  // });
-
   useQuery(USER_INFO, {
-    variables: { getUserByIdUserId: userId },
+    variables: {
+      getUserByIdUserId: userId ? userId : '614973ad05e21128a4d97ed8',
+    },
     onCompleted: (data) => {
       console.log('user 2 query', data.getUserById);
       setUser(data.getUserById);
@@ -210,52 +205,17 @@ export default function UserPage() {
     },
   });
 
-  // const [editGroup] = useMutation(EDIT_GROUP, {
-  //   update(_, { data: { editGroup: groupData } }) {
-  //     setGroup(groupData);
-  //     console.log(groupData);
-  //     setEditOpen(false);
-  //     // router.reload();
-  //   },
-  //   onError: (error) => {
-  //     console.log(JSON.stringify(error, null, 2));
-  //     // console.log('error', error.graphQLErrors[0].extensions.exception.errors);
-  //     if (error.graphQLErrors[0]) {
-  //       setErrors(error.graphQLErrors[0].extensions.exception.errors);
-  //     }
-  //   },
-  // });
+  const handleCreateExpenseClick = () => {
+    setCreateExpense(true);
+  };
 
-  // const onChange = (event) => {
-  //   setValues({
-  //     ...values,
-  //     [event.target.name]:
-  //       event.target.name === 'locked' || event.target.name === 'active'
-  //         ? event.target.checked
-  //         : event.target.value,
-  //   });
-  // };
+  const handleCreateExpenseClose = () => {
+    setCreateExpense(false);
+  };
 
-  // const onSubmit = (event) => {
-  //   event.preventDefault();
-  //   setErrors({});
-  //   try {
-  //     editGroup({
-  //       variables: {
-  //         editGroupGroupId: groupId,
-  //         editGroupGroupInput: values,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // const onEditClose = () => {
-  //   setEditOpen(false);
-  // };
-
-  // console.log(transactions);
+  if (!user) {
+    return <h1>Not Logged In</h1>;
+  }
 
   return (
     <div className={styles.mainWrapper}>
@@ -263,13 +223,17 @@ export default function UserPage() {
         <div className={styles.mainWrapper1}>
           <div
             className={styles.mainBgImage}
-            style={{ backgroundImage: `url(https://skunkapetreestands.com/wp-content/uploads/2019/08/Dark-Woods-Banner.jpg)` }}
+            style={{
+              backgroundImage: `url(https://skunkapetreestands.com/wp-content/uploads/2019/08/Dark-Woods-Banner.jpg)`,
+            }}
           >
             <div className={styles.mainEmptyStyles} />
           </div>
           <div className={styles.mainText}>
-            <h1 className={styles.mainHeading}>{"Payment History"}</h1>
-            <div className={styles.mainSection}>{user.firstName + " " + user.lastName}</div>
+            <h1 className={styles.mainHeading}>{'Payment History'}</h1>
+            <div className={styles.mainSection}>
+              {user.firstName + ' ' + user.lastName}
+            </div>
           </div>
         </div>
       </div>
@@ -317,7 +281,13 @@ export default function UserPage() {
               />
             </Dialog>
           </div>
-          {<PersonalHistory groupId={groupId} user2={user} user2Id={userId}></PersonalHistory>}
+          {
+            <PersonalHistory
+              groupId={groupId}
+              user2={user}
+              user2Id={userId}
+            ></PersonalHistory>
+          }
         </div>
       </div>
     </div>

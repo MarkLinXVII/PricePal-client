@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { AuthContext } from '../../src/context/auth';
 import { LockRounded } from '@material-ui/icons';
@@ -158,6 +158,12 @@ export default function GroupPage() {
     router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`));
   const context = useContext(AuthContext);
 
+  useEffect(() => {
+    if (!context.user) {
+      router.push('/');
+    }
+  }, []);
+
   const [createExpense, setCreateExpense] = useState(false);
   const handleCreateExpenseClick = () => {
     setCreateExpense(true);
@@ -173,13 +179,6 @@ export default function GroupPage() {
   const handleCreatePaymentClose = () => {
     setCreatePayment(false);
   };
-
-  // const { loading } = useQuery(GROUP_TRANSACTIONS, {
-  //   variables: { getTransactionsByGroupIdGroupId: groupId },
-  //   onCompleted: (data) => {
-  //     setTransactions(data.getTransactionsByGroupId);
-  //   },
-  // });
 
   useQuery(GROUP_INFO, {
     variables: { getGroupByIdGroupId: groupId },

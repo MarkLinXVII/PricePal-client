@@ -10,13 +10,14 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import gql from 'graphql-tag';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { AuthContext } from '../../../src/context/auth';
 import { ExpenseCard } from 'components/Expenses/ExpenseCard';
 import { StyleRounded } from '@material-ui/icons';
 import { netUser } from '../../utils/functions';
 import { style } from 'dom-helpers';
+import { useRouter } from 'next/router';
 
 // const useStyles = makeStyles((theme) => ({
 //   root: {
@@ -55,19 +56,23 @@ export function PersonalHistory(props) {
       };
 
       const filterByUser = (transaction) => {
+        console.log(transaction.payer.id);
         if (!transaction.payer.id || !transaction.owerIds) {
           return false;
         }
-        if ((transaction.payer.id == user1.id &&
-          transaction.owerIds.includes(user2Id)) ||
-          (transaction.payer.id == user2Id &&
-            transaction.owerIds.includes(user1.id))) {
-          return true;
+        if (user1) {
+          if (
+            (transaction.payer.id == user1.id &&
+              transaction.owerIds.includes(user2Id)) ||
+            (transaction.payer.id == user2Id &&
+              transaction.owerIds.includes(user1.id))
+          ) {
+            return true;
+          } else {
+            return false;
+          }
         }
-        else {
-          return false;
-        }
-      }
+      };
       const temp = filteredTransactions.filter(filterByUser);
 
       const temp2 = temp.sort(compareDates);
@@ -76,6 +81,10 @@ export function PersonalHistory(props) {
       setTransactions(temp2);
     },
   });
+
+  if (!context.user) {
+    return <h1>Not Logged In</h1>;
+  }
 
   return (
     <div>
@@ -90,7 +99,10 @@ export function PersonalHistory(props) {
               </p>
             </TableCell>
             <TableCell>
-              <p style={styles.headerText}>Your Current Balance is: {netUser(user1.id, user2Id, transactions)}</p>
+              <p style={styles.headerText}>
+                Your Current Balance is:{' '}
+                {netUser(user1.id, user2Id, transactions)}
+              </p>
             </TableCell>
           </TableRow>
         </Table>
