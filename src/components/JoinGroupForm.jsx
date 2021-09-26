@@ -26,9 +26,9 @@ export function JoinGroupForm(props) {
       //   router.push(`/Group/${groupData.id}`);
     },
     onError: (error) => {
-      //   console.log('1', JSON.stringify(error, null, 2));
-      console.log('1', error);
-      setErrors(error.graphQLErrors[0].extensions.exception.stacktrace);
+      console.log('1', JSON.stringify(error, null, 2));
+      // console.log('1', error);
+      setErrors(error.graphQLErrors[0]);
     },
   });
   const onSubmit = (event) => {
@@ -45,6 +45,7 @@ export function JoinGroupForm(props) {
       console.log(err);
     }
   };
+
   return (
     <Dialog
       open={props.open}
@@ -77,16 +78,13 @@ export function JoinGroupForm(props) {
               </Button>
             </Grid>
             <Grid item xs={12}>
-              {Object.keys(errors).length > 0 &&
-                Object.values(errors).map((err) => {
-                  return (
-                    <Alert severity="error" key={err}>
-                      <Typography style={{ fontSize: '12px' }}>
-                        {err}
-                      </Typography>
-                    </Alert>
-                  );
-                })}
+              {errors.hasOwnProperty('message') && (
+                <Alert severity="error">
+                  <Typography style={{ fontSize: '12px' }}>
+                    {errors.message}
+                  </Typography>
+                </Alert>
+              )}
             </Grid>
           </Grid>
         </form>
